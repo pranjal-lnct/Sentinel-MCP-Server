@@ -30,7 +30,7 @@ async def run_sast_scan(target_path: str) -> str:
 
 @mcp.tool()
 async def run_sca_scan(target_path: str) -> str:
-    """Run SCA scan using Trivy."""
+    """Run SCA scan using Trivy and Grype (Unified)."""
     try:
         result = await scanner.run_sca(target_path)
         return json.dumps(result)
