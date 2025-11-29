@@ -52,6 +52,18 @@ To start the MCP server manually (for testing):
 mcp run python src/sentinel/server.py
 ```
 
+### Manual Scanning (CLI)
+
+You can also scan any project directory directly from the terminal using the included utility script:
+
+```bash
+# Scan a specific project directory
+python3 scan_project.py /path/to/your/project
+
+# Run only specific scans (e.g., secrets)
+python3 scan_project.py /path/to/your/project --type secrets
+```
+
 ## 💻 IDE Configuration
 
 ### VS Code
