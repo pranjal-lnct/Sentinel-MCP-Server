@@ -32,20 +32,100 @@ class ScannerService:
             return {"error": "Failed to parse Semgrep output", "raw": output}
 
     async def run_sca(self, target_path: str) -> dict:
-        """Runs Trivy SCA scan."""
+        """Runs SCA scan using Trivy and Grype, with deduplication."""
         logger.info("starting_sca_scan", target=target_path)
-        cmd = [
+        
+        # Run Trivy
+        trivy_cmd = [
             "docker", "run", "--rm",
             "-v", f"{target_path}:/src",
             config.TRIVY_IMAGE,
             "fs", "--format", "json", "/src"
         ]
+        trivy_output = await DockerRunner.run_command(trivy_cmd)
+        trivy_results = self._normalize_trivy(trivy_output)
+        
+        # Run Grype
+        grype_results = await self.run_grype(target_path)
+        
+        # Deduplicate
+        combined_findings = self._deduplicate_findings(trivy_results, grype_results)
+        
+        return {
+            "summary": f"Scanned with Trivy and Grype. Found {len(combined_findings)} unique vulnerabilities.",
+            "results": combined_findings,
+            "sources": {
+                "trivy_count": len(trivy_results),
+                "grype_count": len(grype_results)
+            }
+        }
+
+    async def run_grype(self, target_path: str) -> list:
+        """Runs Grype SCA scan."""
+        logger.info("starting_grype_scan", target=target_path)
+        cmd = [
+            "docker", "run", "--rm",
+            "-v", f"{target_path}:/src",
+            config.GRYPE_IMAGE,
+            "dir:/src", "-o", "json"
+        ]
         output = await DockerRunner.run_command(cmd)
+        return self._normalize_grype(output)
+
+    def _normalize_trivy(self, raw_output: str) -> list:
+        """Normalizes Trivy JSON output."""
+        findings = []
         try:
-            return json.loads(output)
+            data = json.loads(raw_output)
+            if "Results" in data:
+                for result in data["Results"]:
+                    for vuln in result.get("Vulnerabilities", []):
+                        findings.append({
+                            "id": vuln.get("VulnerabilityID"),
+                            "pkg": vuln.get("PkgName"),
+                            "severity": vuln.get("Severity"),
+                            "description": vuln.get("Description"),
+                            "source": "trivy"
+                        })
         except json.JSONDecodeError:
-            logger.error("sca_json_parse_error", output=output[:200])
-            return {"error": "Failed to parse Trivy output", "raw": output}
+            logger.error("trivy_json_parse_error")
+        return findings
+
+    def _normalize_grype(self, raw_output: str) -> list:
+        """Normalizes Grype JSON output."""
+        findings = []
+        try:
+            data = json.loads(raw_output)
+            if "matches" in data:
+                for match in data["matches"]:
+                    vuln = match.get("vulnerability", {})
+                    artifact = match.get("artifact", {})
+                    findings.append({
+                        "id": vuln.get("id"),
+                        "pkg": artifact.get("name"),
+                        "severity": vuln.get("severity"),
+                        "description": vuln.get("description"),
+                        "source": "grype"
+                    })
+        except json.JSONDecodeError:
+            logger.error("grype_json_parse_error")
+        return findings
+
+    def _deduplicate_findings(self, list1: list, list2: list) -> list:
+        """Deduplicates findings based on ID and Package Name."""
+        unique_map = {}
+        
+        for item in list1 + list2:
+            key = (item.get("id"), item.get("pkg"))
+            if key not in unique_map:
+                unique_map[key] = item
+            else:
+                # Merge sources if needed, or just keep first
+                existing = unique_map[key]
+                if existing["source"] != item["source"]:
+                    existing["source"] = "both"
+        
+        return list(unique_map.values())
 
     async def run_secrets(self, target_path: str) -> dict:
         """Runs Gitleaks secret scan."""

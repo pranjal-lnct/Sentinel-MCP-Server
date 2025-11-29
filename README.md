@@ -15,6 +15,7 @@
 | :--- | :--- | :--- |
 | **Semgrep** | SAST (Static Analysis) | `returntocorp/semgrep` (Rules: OWASP Top 10, CWE Top 25, Security Audit) |
 | **Trivy** | SCA & Compliance | `aquasec/trivy` |
+| **Grype** | SCA (Vulnerability Scanning) | `anchore/grype` |
 | **Gitleaks** | Secret Scanning | `zricethezav/gitleaks` |
 | **OWASP ZAP** | DAST (Web Scanning) | `owasp/zap2docker-stable` |
 | **ClamAV** | Malware Scanning | `clamav/clamav` |
@@ -97,6 +98,7 @@ You can configure Sentinel using environment variables:
 | `SENTINEL_DOCKER_TIMEOUT` | Timeout for Docker commands in seconds | `600` |
 | `SENTINEL_SEMGREP_IMAGE` | Custom Docker image for Semgrep | `returntocorp/semgrep` |
 | `SENTINEL_TRIVY_IMAGE` | Custom Docker image for Trivy | `aquasec/trivy` |
+| `SENTINEL_GRYPE_IMAGE` | Custom Docker image for Grype | `anchore/grype` |
 | `SENTINEL_SCHEMATHESIS_IMAGE` | Custom Docker image for Schemathesis | `schemathesis/schemathesis:stable` |
 | `SENTINEL_LLM_API_KEY` | API Key for AI Threat Modeling (e.g., OpenAI) | `None` (Falls back to heuristic) |
 | `SENTINEL_LLM_MODEL` | LLM Model to use | `gpt-4o` |
