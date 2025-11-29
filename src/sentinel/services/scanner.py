@@ -18,7 +18,11 @@ class ScannerService:
             "docker", "run", "--rm",
             "-v", f"{target_path}:/src",
             config.SEMGREP_IMAGE,
-            "semgrep", "scan", "--config=auto", "--json", "/src"
+            "semgrep", "scan", 
+            "--config=p/owasp-top-ten", 
+            "--config=p/cwe-top-25", 
+            "--config=p/security-audit",
+            "--json", "/src"
         ]
         output = await DockerRunner.run_command(cmd)
         try:

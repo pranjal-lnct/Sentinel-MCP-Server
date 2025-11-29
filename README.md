@@ -13,7 +13,7 @@
 
 | Tool | Function | Docker Image |
 | :--- | :--- | :--- |
-| **Semgrep** | SAST (Static Analysis) | `returntocorp/semgrep` |
+| **Semgrep** | SAST (Static Analysis) | `returntocorp/semgrep` (Rules: OWASP Top 10, CWE Top 25, Security Audit) |
 | **Trivy** | SCA & Compliance | `aquasec/trivy` |
 | **Gitleaks** | Secret Scanning | `zricethezav/gitleaks` |
 | **OWASP ZAP** | DAST (Web Scanning) | `owasp/zap2docker-stable` |
