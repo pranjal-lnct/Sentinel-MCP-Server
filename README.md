@@ -20,6 +20,7 @@
 | **OWASP ZAP** | DAST (Web Scanning) | `owasp/zap2docker-stable` |
 | **ClamAV** | Malware Scanning | `clamav/clamav` |
 | **Schemathesis** | API Fuzzing | `schemathesis/schemathesis:stable` |
+| **EOL Scanner** | Runtime/Framework EOL Checks | *Built-in (endoflife.date API)* |
 | **AI Threat Modeler** | STRIDE Analysis | *Built-in (LLM Powered)* |
 
 ## 🚀 Getting Started
@@ -75,9 +76,9 @@ To use Sentinel with the **MCP Servers** extension in VS Code, add the following
 {
   "mcpServers": {
     "sentinel": {
-      "command": "/ABSOLUTE/PATH/TO/sentinel-mcp-server/.venv/bin/python3",
+      "command": "/Users/pranjalsharma/Documents/SourceCode/appsec/sentinel-mcp-server/.venv/bin/python3",
       "args": [
-        "/ABSOLUTE/PATH/TO/sentinel-mcp-server/src/sentinel/server.py"
+        "/Users/pranjalsharma/Documents/SourceCode/appsec/sentinel-mcp-server/src/sentinel/server.py"
       ],
       "env": {
         "SENTINEL_LOG_LEVEL": "INFO"

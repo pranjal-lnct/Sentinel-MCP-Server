@@ -3,6 +3,7 @@ from mcp.server.fastmcp import FastMCP
 from sentinel.services.scanner import ScannerService
 from sentinel.services.compliance import ComplianceService
 from sentinel.services.threat_modeling import ThreatModelingService
+from sentinel.services.eol import EolService
 from sentinel.core.logger import configure_logger, get_logger
 from sentinel.core.exceptions import SentinelError
 
@@ -17,6 +18,7 @@ mcp = FastMCP("sentinel-agent")
 scanner = ScannerService()
 compliance = ComplianceService()
 threat_modeler = ThreatModelingService()
+eol_service = EolService()
 
 @mcp.tool()
 async def run_sast_scan(target_path: str) -> str:
@@ -96,6 +98,16 @@ async def run_threat_modeling(project_description: str) -> str:
         return json.dumps(result)
     except Exception as e:
         logger.error("tool_execution_failed", tool="threat_modeling", error=str(e))
+        return json.dumps({"error": str(e)})
+
+@mcp.tool()
+async def run_eol_scan(target_path: str) -> str:
+    """Check for End-of-Life (EOL) runtimes and frameworks."""
+    try:
+        result = await eol_service.check_eol(target_path)
+        return json.dumps(result)
+    except Exception as e:
+        logger.error("tool_execution_failed", tool="eol", error=str(e))
         return json.dumps({"error": str(e)})
 
 import json
