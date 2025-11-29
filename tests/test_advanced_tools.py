@@ -22,15 +22,28 @@ class TestAdvancedTools(unittest.IsolatedAsyncioTestCase):
         Test Threat Modeling (Heuristic Fallback).
         """
         print("\nRunning Threat Modeling (Heuristic)...")
-        description = "A web application with a SQL database and file upload feature."
+        # We need a target path now
+        target = self.resources_dir
         
-        # Ensure API key is unset to force heuristic
-        if "SENTINEL_LLM_API_KEY" in os.environ:
-            del os.environ["SENTINEL_LLM_API_KEY"]
+        # Create a dummy docker-compose to trigger heuristic
+        dc_path = os.path.join(target, "docker-compose.yml")
+        with open(dc_path, "w") as f:
+            f.write("services:\n  db:\n    image: postgres")
             
-        result = await self.threat_modeler.generate_stride_report(description)
-        
-        print(f"Result: {json.dumps(result, indent=2)}")
+        try:
+            result = await self.threat_modeler.generate_stride_report(target, "A simple web app")
+            
+            self.assertIsInstance(result, dict)
+            self.assertIn("threats", result)
+            threats = result["threats"]
+            
+            # Should detect database from docker-compose
+            found_db_threat = any(t["category"] == "Tampering" and "Database" in t["description"] for t in threats)
+            self.assertTrue(found_db_threat, "Should detect DB threat from docker-compose")
+            
+        finally:
+            if os.path.exists(dc_path):
+                os.remove(dc_path)
         
         self.assertIn("system_summary", result)
         self.assertIn("threats", result)

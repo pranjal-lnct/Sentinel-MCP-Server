@@ -91,10 +91,10 @@ async def run_api_fuzzing(schema_url: str) -> str:
         return json.dumps({"error": str(e)})
 
 @mcp.tool()
-async def run_threat_modeling(project_description: str) -> str:
-    """Generate a STRIDE Threat Model (AI-Powered)."""
+async def run_threat_modeling(target_path: str, project_description: str = "") -> str:
+    """Generate a STRIDE Threat Model (AI-Powered) based on code context."""
     try:
-        result = await threat_modeler.generate_stride_report(project_description)
+        result = await threat_modeler.generate_stride_report(target_path, project_description)
         return json.dumps(result)
     except Exception as e:
         logger.error("tool_execution_failed", tool="threat_modeling", error=str(e))
