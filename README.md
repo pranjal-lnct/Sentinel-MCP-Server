@@ -22,7 +22,7 @@
 | **Schemathesis** | API Fuzzing | `schemathesis/schemathesis:stable` |
 | **EOL Scanner** | Runtime/Framework EOL Checks | *Built-in (endoflife.date API)* |
 | **Crypto Scanner** | SSL/TLS Compliance | `drwetter/testssl.sh` |
-| **AI Threat Modeler** | STRIDE Analysis | *Built-in (LLM Powered + Code Context)* |
+| **AI Threat Modeler** | STRIDE Analysis | *Built-in (LLM Powered + Code Context + Mermaid DFD)* |
 
 ## 🚀 Getting Started
 

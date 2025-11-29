@@ -46,6 +46,7 @@ class TestAdvancedTools(unittest.IsolatedAsyncioTestCase):
                 os.remove(dc_path)
         
         self.assertIn("system_summary", result)
+        self.assertIn("dfd_diagram", result)
         self.assertIn("threats", result)
         
         # Check for expected heuristic findings

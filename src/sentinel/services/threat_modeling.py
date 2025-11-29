@@ -49,6 +49,7 @@ class ThreatModelingService:
             Return the output strictly as a JSON object with the following structure:
             {{
                 "system_summary": "...",
+                "dfd_diagram": "graph TD; ...",
                 "threats": [
                     {{
                         "category": "Spoofing",
@@ -98,6 +99,9 @@ class ThreatModelingService:
         tree = context.get("file_tree", "")
         desc_lower = description.lower()
         
+        # Simple Heuristic DFD
+        dfd = "graph TD;\n  User[User] -->|HTTPS| WebApp[Web Application];"
+        
         # Database
         if "docker-compose" in str(files) and ("postgres" in str(files) or "mysql" in str(files)):
              threats.append({
@@ -105,12 +109,14 @@ class ThreatModelingService:
                 "description": "Database detected in docker-compose. Potential SQL Injection or data tampering.",
                 "mitigation": "Use parameterized queries and input validation."
             })
+             dfd += "\n  WebApp -->|SQL| DB[(Database)];"
         elif "database" in desc_lower or "sql" in desc_lower:
              threats.append({
                 "category": "Tampering",
                 "description": "Potential SQL Injection or data tampering in database.",
                 "mitigation": "Use parameterized queries and input validation."
             })
+             dfd += "\n  WebApp -->|SQL| DB[(Database)];"
 
         # Auth
         if "login" in desc_lower or "auth" in desc_lower or "jwt" in str(files):
@@ -137,5 +143,6 @@ class ThreatModelingService:
 
         return {
             "system_summary": "Heuristic Analysis (LLM not configured). Based on file structure.",
+            "dfd_diagram": dfd,
             "threats": threats
         }
