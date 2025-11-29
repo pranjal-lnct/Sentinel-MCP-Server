@@ -21,6 +21,7 @@
 | **ClamAV** | Malware Scanning | `clamav/clamav` |
 | **Schemathesis** | API Fuzzing | `schemathesis/schemathesis:stable` |
 | **EOL Scanner** | Runtime/Framework EOL Checks | *Built-in (endoflife.date API)* |
+| **Crypto Scanner** | SSL/TLS Compliance | `drwetter/testssl.sh` |
 | **AI Threat Modeler** | STRIDE Analysis | *Built-in (LLM Powered)* |
 
 ## 🚀 Getting Started
@@ -100,6 +101,7 @@ You can configure Sentinel using environment variables:
 | `SENTINEL_SEMGREP_IMAGE` | Custom Docker image for Semgrep | `returntocorp/semgrep` |
 | `SENTINEL_TRIVY_IMAGE` | Custom Docker image for Trivy | `aquasec/trivy` |
 | `SENTINEL_GRYPE_IMAGE` | Custom Docker image for Grype | `anchore/grype` |
+| `SENTINEL_TESTSSL_IMAGE` | Custom Docker image for testssl.sh | `drwetter/testssl.sh` |
 | `SENTINEL_SCHEMATHESIS_IMAGE` | Custom Docker image for Schemathesis | `schemathesis/schemathesis:stable` |
 | `SENTINEL_LLM_API_KEY` | API Key for AI Threat Modeling (e.g., OpenAI) | `None` (Falls back to heuristic) |
 | `SENTINEL_LLM_MODEL` | LLM Model to use | `gpt-4o` |

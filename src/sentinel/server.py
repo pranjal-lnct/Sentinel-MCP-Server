@@ -110,6 +110,16 @@ async def run_eol_scan(target_path: str) -> str:
         logger.error("tool_execution_failed", tool="eol", error=str(e))
         return json.dumps({"error": str(e)})
 
+@mcp.tool()
+async def run_crypto_scan(target_url: str) -> str:
+    """Run SSL/TLS Compliance Scan (testssl.sh)."""
+    try:
+        result = await scanner.run_crypto_scan(target_url)
+        return json.dumps(result)
+    except Exception as e:
+        logger.error("tool_execution_failed", tool="crypto", error=str(e))
+        return json.dumps({"error": str(e)})
+
 import json
 
 if __name__ == "__main__":

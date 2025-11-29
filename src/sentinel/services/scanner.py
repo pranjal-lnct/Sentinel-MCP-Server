@@ -22,6 +22,7 @@ class ScannerService:
             "--config=p/owasp-top-ten", 
             "--config=p/cwe-top-25", 
             "--config=p/security-audit",
+            "--config=p/cryptography",
             "--json", "/src"
         ]
         output = await DockerRunner.run_command(cmd)
@@ -183,6 +184,61 @@ class ScannerService:
                     infected_files.append({"file": parts[0].strip(), "threat": parts[1].strip()})
         
         return {"infected_files": infected_files, "raw_output": output}
+
+    async def run_crypto_scan(self, target_url: str) -> dict:
+        """
+        Runs SSL/TLS Compliance Scan using testssl.sh.
+        Target: URL (e.g., https://example.com)
+        """
+        logger.info("starting_crypto_scan", target=target_url)
+        
+        # testssl.sh outputs JSON file
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            report_file = "testssl_report.json"
+            cmd = [
+                "docker", "run", "--rm",
+                "-v", f"{tmp_dir}:/data",
+                config.TESTSSL_IMAGE,
+                "--jsonfile", f"/data/{report_file}",
+                "--quiet", "--warnings", "off",
+                target_url
+            ]
+            
+            # testssl.sh often returns non-zero exit codes for findings, so we catch errors
+            try:
+                await DockerRunner.run_command(cmd)
+            except ToolExecutionError as e:
+                # Check if report exists, if so, it's likely just findings
+                pass
+            
+            report_path = os.path.join(tmp_dir, report_file)
+            if os.path.exists(report_path):
+                try:
+                    with open(report_path, 'r') as f:
+                        # testssl.sh JSON output is sometimes a list of objects
+                        data = json.load(f)
+                        
+                        # Filter for high severity issues
+                        findings = []
+                        for item in data:
+                            severity = item.get("severity", "INFO")
+                            if severity in ["HIGH", "CRITICAL", "MEDIUM"]:
+                                findings.append({
+                                    "id": item.get("id"),
+                                    "severity": severity,
+                                    "finding": item.get("finding"),
+                                    "cve": item.get("cve")
+                                })
+                        
+                        return {
+                            "summary": f"Crypto Scan Complete. Found {len(findings)} issues.",
+                            "findings": findings,
+                            "raw_report_path": "Available in temp dir (not persisted)" 
+                        }
+                except json.JSONDecodeError:
+                    return {"error": "Failed to parse testssl.sh output"}
+            else:
+                return {"error": "Crypto scan failed to generate report."}
 
     async def run_api_fuzzing(self, schema_url: str) -> dict:
         """

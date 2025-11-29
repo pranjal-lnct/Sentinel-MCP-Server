@@ -12,6 +12,7 @@ class SentinelConfig:
     GITLEAKS_IMAGE = os.getenv("SENTINEL_GITLEAKS_IMAGE", "zricethezav/gitleaks")
     ZAP_IMAGE: str = os.getenv("SENTINEL_ZAP_IMAGE", "owasp/zap2docker-stable")
     CLAMAV_IMAGE: str = os.getenv("SENTINEL_CLAMAV_IMAGE", "clamav/clamav")
+    TESTSSL_IMAGE: str = os.getenv("SENTINEL_TESTSSL_IMAGE", "drwetter/testssl.sh")
     SCHEMATHESIS_IMAGE: str = os.getenv("SENTINEL_SCHEMATHESIS_IMAGE", "schemathesis/schemathesis:stable")
     
     # Settings
